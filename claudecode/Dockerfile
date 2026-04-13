@@ -98,38 +98,38 @@ RUN mkdir -p \
     /root/.local/bin
 
 # Configure tmux with large scrollback buffer and scroll support
-RUN cat > /root/.tmux.conf << 'EOF'
-set -g history-limit 20000
-# Disable alternate screen buffer to allow terminal scrollback
-set -ga terminal-overrides ',xterm*:smcup@:rmcup@'
-# Enable mouse support for scrolling (but may affect copy/paste)
-set -g mouse on
-# Bind mouse wheel to scroll through history in copy mode
-bind -n WheelUpPane if-shell -F -t = "#{mouse_any_flag}" "send-keys -M" "if -Ft= '#{pane_in_mode}' 'send-keys -M' 'select-pane -t=; copy-mode -e; send-keys -M'"
-bind -n WheelDownPane select-pane -t= \; send-keys -M
-EOF
+RUN { \
+    echo 'set -g history-limit 20000'; \
+    echo '# Disable alternate screen buffer to allow terminal scrollback'; \
+    echo "set -ga terminal-overrides ',xterm*:smcup@:rmcup@'"; \
+    echo '# Enable mouse support for scrolling (but may affect copy/paste)'; \
+    echo 'set -g mouse on'; \
+    echo '# Bind mouse wheel to scroll through history in copy mode'; \
+    echo "bind -n WheelUpPane if-shell -F -t = \"#{mouse_any_flag}\" \"send-keys -M\" \"if -Ft= '#{pane_in_mode}' 'send-keys -M' 'select-pane -t=; copy-mode -e; send-keys -M'\""; \
+    echo 'bind -n WheelDownPane select-pane -t= \; send-keys -M'; \
+    } > /root/.tmux.conf
 
 # Configure bash with aliases and prompt
-RUN cat > /root/.bashrc << 'EOF'
-export TERM=xterm-256color
-export LANG=C.UTF-8
-PS1='\[\033[1;36m\]claude-code\[\033[0m\]:\[\033[1;34m\]\w\[\033[0m\]\$ '
-
-# Function to update MCP token before starting Claude
-update_mcp_token() {
-  local SETTINGS_FILE=/root/.claude/settings.json
-  if [ -f "$SETTINGS_FILE" ] && [ -n "$SUPERVISOR_TOKEN" ]; then
-    jq ".mcpServers.homeassistant.env.HASS_TOKEN = \"$SUPERVISOR_TOKEN\"" "$SETTINGS_FILE" > /tmp/settings.tmp 2>/dev/null && mv /tmp/settings.tmp "$SETTINGS_FILE"
-  fi
-}
-
-# Aliases
-alias ll='ls -la'
-alias c='update_mcp_token && claude'
-alias cc='update_mcp_token && claude --continue'
-alias ha-config='cd /homeassistant'
-alias ha-logs='cat /homeassistant/home-assistant.log 2>/dev/null || echo "Log not found"'
-EOF
+RUN { \
+    echo 'export TERM=xterm-256color'; \
+    echo 'export LANG=C.UTF-8'; \
+    printf "PS1='%s'\n" '\[\033[1;36m\]claude-code\[\033[0m\]:\[\033[1;34m\]\w\[\033[0m\]\$ '; \
+    echo ''; \
+    echo '# Function to update MCP token before starting Claude'; \
+    echo 'update_mcp_token() {'; \
+    echo '  local SETTINGS_FILE=/root/.claude/settings.json'; \
+    echo '  if [ -f "$SETTINGS_FILE" ] && [ -n "$SUPERVISOR_TOKEN" ]; then'; \
+    echo '    jq ".mcpServers.homeassistant.env.HASS_TOKEN = \"$SUPERVISOR_TOKEN\"" "$SETTINGS_FILE" > /tmp/settings.tmp 2>/dev/null && mv /tmp/settings.tmp "$SETTINGS_FILE"'; \
+    echo '  fi'; \
+    echo '}'; \
+    echo ''; \
+    echo '# Aliases'; \
+    echo "alias ll='ls -la'"; \
+    echo "alias c='update_mcp_token && claude'"; \
+    echo "alias cc='update_mcp_token && claude --continue'"; \
+    echo "alias ha-config='cd /homeassistant'"; \
+    echo 'alias ha-logs='"'"'cat /homeassistant/home-assistant.log 2>/dev/null || echo "Log not found"'"'"''; \
+    } > /root/.bashrc
 
 # Ensure .bashrc is sourced for login shells too
 RUN echo 'source ~/.bashrc' > /root/.profile

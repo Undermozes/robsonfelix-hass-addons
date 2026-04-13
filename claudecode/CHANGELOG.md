@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.64] - 2026-04-13
+
+### Fixed
+- Docker build failure caused by heredoc (`<< 'EOF'`) syntax in RUN commands not being supported by the Docker version used in Home Assistant; replaced with equivalent echo/printf commands
+
 ## [1.2.63] - 2026-02-23
 
 ### Fixed
