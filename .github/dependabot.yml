@@ -1,0 +1,48 @@
+# Keeps the things this repository pins up to date.
+#
+# It exists because an immutable pin solves one problem and creates another:
+# home-assistant/builder is fixed at a SHA and, without this, would sit at
+# 2026.03.2 forever. And because the playwright-browser base image drifted
+# seven minor versions (1.50 -> 1.57 while stable reached 1.64) with nothing
+# flagging it, until someone noticed by hand.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: ci
+    labels: [dependencies]
+    ignore:
+      # home-assistant/builder pulls a Docker image tagged with the very ref
+      # from its `uses:` line, and images are not published for every release.
+      # Dependabot proposed 2026.09.0, which has no image for either
+      # architecture, and that bump fails the build in ~200ms with "not
+      # found". Updating this one stays manual; see the check documented in
+      # build.yml before changing the pin.
+      - dependency-name: home-assistant/builder
+
+  # The only Dockerfile with a concrete base image. The others use
+  # ${BUILD_FROM}, which Dependabot does not resolve - see the limits below.
+  - package-ecosystem: docker
+    directory: "/playwright-browser"
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: build
+    labels: [dependencies]
+
+# WHAT THIS DOES NOT COVER, and stays manual:
+#
+#   claudecode/build.yaml and auto-monocle/build.yaml
+#     The real base images (ghcr.io/home-assistant/*-base-python:3.13-alpine*)
+#     live there, not in the Dockerfile. Dependabot does not read build.yaml.
+#
+#   claudecode/Dockerfile
+#     TTYD_CLIENT_COMMIT  pinned commit of the ttyd source
+#     ttyd 1.7.7          binary version, in the download URL
+#     corepack@0.35.0     pinned inside a RUN step
+#
+#   claudecode: @playwright/mcp
+#     Deliberately unpinned; see the coupling note in the README.

@@ -37,6 +37,11 @@ profile claudecode flags=(attach_disconnected,mediate_deleted) {
   /usr/bin/** ixr,
   /usr/lib/** ixmr,
   /usr/local/** ixr,
+  # npm's global prefix. Only these two subtrees are writable, so `npm -g` can
+  # install and update Claude Code; without w it fails with EACCES on rename
+  # even as root. The rest of /usr/local stays read-only.
+  /usr/local/bin/** rwixk,
+  /usr/local/lib/node_modules/** rwixk,
   /usr/libexec/** ixr,
 
   # Add-on data
@@ -67,4 +72,14 @@ profile claudecode flags=(attach_disconnected,mediate_deleted) {
 
   # Node.js modules
   /usr/lib/node_modules/** ixmr,
+
+  # Python C extensions (the stdlib's lib-dynload for ha-ws, pydantic-core for
+  # hass-mcp) are mmap'ed from /usr/local/lib; abstractions/base only covers
+  # /usr/lib*/lib*.so*, and /usr/local/** above grants no m.
+  /usr/local/lib/python3*/** mr,
+
+  # Playwright MCP server (installed under /opt to avoid /usr/local/bin/mcp
+  # collision with hass-mcp; the /usr/local/bin/playwright-mcp symlink
+  # resolves through here, so AppArmor needs the /opt path allowed too)
+  /opt/playwright-mcp/** ixmr,
 }

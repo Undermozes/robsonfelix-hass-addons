@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Changed
+- `config.yaml` now declares `image: ghcr.io/robsonfelix/auto-monocle-{arch}`,
+  so the Supervisor pulls the image CI already publishes instead of building
+  the add-on locally. No version bump: the published `0.1.12` image matches the
+  version on main, and the Supervisor reads `config.yaml` from the store, so
+  new installs pull it immediately
+
+## [0.1.12] - 2026-11-01
+
+### Fixed
+- Removed `startup: application`, `boot: auto` and `ingress: false` from `config.yaml`; all three restated the Supervisor's defaults
+- `stream_quality` had no translation in any of the three languages, so the option rendered without a name or description in the Home Assistant UI. Found by the repository's new CI check, which now verifies every add-on's options against its schema and all of its translation files
+
 ## [0.1.11] - 2026-01-14
 
 ### Fixed

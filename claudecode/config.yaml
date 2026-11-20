@@ -1,17 +1,25 @@
 name: Claude Code
 description: Run Claude Code AI assistant inside Home Assistant to create automations, debug issues, and manage your smart home configuration
-version: "1.2.64"
+version: "1.2.78"
 slug: claudecode
+image: ghcr.io/robsonfelix/claudecode-{arch}
 url: https://github.com/robsonfelix/robsonfelix-hass-addons
 arch:
   - amd64
   - aarch64
-  - armv7
-  - armhf
-  - i386
-startup: application
-boot: auto
-init: true
+# Share the host's UTS namespace so the container's hostname is the Home
+# Assistant host's (e.g. "homeassistant") rather than the add-on slug
+# ("d7e97e69-claudecode"): Claude Code reports the machine's hostname to
+# claude.ai for Remote Control, and `hostname` in the terminal matches the box.
+# Nothing the add-on runs reads the container hostname (the Playwright launcher
+# derives its target from the add-on slug). The AppArmor profile grants no
+# sys_admin, so a process in this container cannot call sethostname() (the
+# add-on's Docker socket and full_access reach the host anyway, as the README's
+# security note says). Docker still writes the container id, not the host's
+# name, into /etc/hosts, so `homeassistant` keeps resolving through the
+# Supervisor's DNS to HA Core (checked on a live install, 2026-11-03).
+host_uts: true
+stdin: true
 ingress: true
 ingress_port: 7681
 ingress_stream: true
@@ -21,7 +29,6 @@ homeassistant_api: true
 auth_api: true
 hassio_api: true
 hassio_role: manager
-uart: true
 docker_api: true
 full_access: true
 map:
@@ -32,6 +39,9 @@ map:
   - addon_config:rw
   - backup:ro
 options:
+  default_task_model: ""
+  default_task_allowed_tools: []
+  task_max_runtime_minutes: 30
   enable_mcp: true
   enable_playwright_mcp: false
   playwright_cdp_host: ""
@@ -40,7 +50,17 @@ options:
   working_directory: /homeassistant
   session_persistence: true
   auto_update_claude: true
+  auto_launch_claude: "off"
+  enable_remote_control: false
+  remote_control_session_prefix: HomeAssistant
+  extra_npm_packages: []
+  remote_control_server: false
+  remote_control_permission_mode: default
 schema:
+  default_task_model: str?
+  default_task_allowed_tools:
+    - str
+  task_max_runtime_minutes: int(1,240)
   enable_mcp: bool
   enable_playwright_mcp: bool
   playwright_cdp_host: str?
@@ -49,5 +69,12 @@ schema:
   working_directory: str
   session_persistence: bool
   auto_update_claude: bool
+  auto_launch_claude: list(off|new|continue)
+  enable_remote_control: bool
+  remote_control_session_prefix: str
+  extra_npm_packages:
+    - str?
+  remote_control_server: bool
+  remote_control_permission_mode: list(default|acceptEdits|auto|plan|dontAsk)
 environment:
   TERM: xterm-256color
