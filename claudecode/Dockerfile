@@ -30,7 +30,12 @@ ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0 \
     COREPACK_NPM_REGISTRY=https://registry.npmjs.org \
     COREPACK_INTEGRITY_KEYS=0
 RUN npm install -g corepack@0.35.0 && corepack enable && \
-    yarn install --immutable && yarn run inline
+    yarn install --immutable
+# Mobile tweaks (key bar, photo upload, debounced resize, per-device font
+# size): injected into the page template, not into ttyd's TypeScript, so the
+# client's ESLint/prettier checks stay untouched. See ttyd-mobile/mobile.js.
+COPY ttyd-mobile /ttyd-mobile
+RUN sh /ttyd-mobile/inject.sh src/template.html && yarn run inline
 
 FROM ${BUILD_FROM}
 
@@ -246,6 +251,9 @@ CMD ["/bin/bash", "-c", "\
   if [ ! -L /root/.config/claude-code ]; then rm -rf /root/.config/claude-code; ln -s $PERSIST_DIR/config /root/.config/claude-code; fi && \
   if [ ! -L /root/.claude.json ]; then touch $PERSIST_DIR/.claude.json; rm -f /root/.claude.json; ln -s $PERSIST_DIR/.claude.json /root/.claude.json; fi && \
   FONT_SIZE=$(jq -r '.terminal_font_size // 14' /data/options.json) && \
+  MOBILE_FONT_SIZE=$(jq -r '.terminal_font_size_mobile // 13' /data/options.json) && \
+  LINE_HEIGHT=$(jq -r '.terminal_line_height // 1.2' /data/options.json) && \
+  { mkdir -p /media/claudecode 2>/dev/null || echo '[WARN] Could not create /media/claudecode (photo uploads from the key bar)'; } && \
   THEME=$(jq -r '.terminal_theme // \"dark\"' /data/options.json) && \
   SESSION_PERSIST=$(jq -r 'if .session_persistence == null then true else .session_persistence end' /data/options.json) && \
   ENABLE_MCP=$(jq -r 'if .enable_mcp == null then true else .enable_mcp end' /data/options.json) && \
@@ -406,7 +414,9 @@ CMD ["/bin/bash", "-c", "\
   exec ttyd --port 7681 --writable --ping-interval 30 --max-clients 5 \
     --index /usr/share/ttyd/index.html \
     -t fontSize=$FONT_SIZE \
-    -t fontFamily=Monaco,Consolas,monospace \
+    -t mobileFontSize=$MOBILE_FONT_SIZE \
+    -t lineHeight=$LINE_HEIGHT \
+    -t \"fontFamily=Menlo,Monaco,Consolas,'DejaVu Sans Mono','Liberation Mono','Roboto Mono','Droid Sans Mono',monospace\" \
     -t scrollback=20000 \
     -t \"theme=$COLORS\" \
     $SHELL_CMD \

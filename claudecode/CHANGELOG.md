@@ -2,7 +2,32 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [1.2.79] - 2026-11-20
+
+### Added
+- **Key bar on phones and tablets** in the web terminal: Esc, Shift+Tab,
+  arrows (repeat while held), Enter, Ctrl+C, Tab, paste and A-/A+ for the font
+  size (remembered per device). It scrolls sideways on narrow screens.
+- **Photo upload from the key bar** ("Foto"): pick one or more photos, they are
+  scaled down to 2000 px JPEG, stored in `/media/claudecode/` through Home
+  Assistant's own media upload (admin session, same origin as the ingress
+  page) and their paths are typed into the prompt so Claude Code reads them.
+- Options `terminal_font_size_mobile` (default 13) and `terminal_line_height`
+  (default 1.2), translated in all four languages.
+
+### Changed
+- Fork: merged upstream up to 1.2.78. `image:` is removed from `config.yaml`
+  so the Supervisor builds this fork's Dockerfile instead of pulling
+  upstream's image from ghcr.io/robsonfelix.
+- Line height 1.2 instead of 1.0: lines were packed together and hard to read.
+- Font stack with fonts that exist on iOS and Android (Menlo, Roboto Mono,
+  Droid Sans Mono) instead of only Monaco/Consolas.
+- Resizes are debounced. A soft keyboard fires a burst of resize events while
+  it animates and each one resized the pty, making tmux and Claude Code redraw
+  the full screen several times per keyboard toggle.
+- On touch devices: scrollback 5000 instead of 20000, no resize overlay, no
+  leave-page alert, no iOS zoom when the terminal gets focus, and the terminal
+  follows the visual viewport when the keyboard overlays the page.
 
 ### Fixed
 - An add-on update could ship a **stale Claude Code**. Nothing in the

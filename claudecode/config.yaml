@@ -1,9 +1,11 @@
 name: Claude Code
 description: Run Claude Code AI assistant inside Home Assistant to create automations, debug issues, and manage your smart home configuration
-version: "1.2.78"
+version: "1.2.79"
 slug: claudecode
-image: ghcr.io/robsonfelix/claudecode-{arch}
-url: https://github.com/robsonfelix/robsonfelix-hass-addons
+# No `image:` in this fork: upstream points at ghcr.io/robsonfelix, which would
+# make the Supervisor pull upstream's image and silently skip this fork's
+# changes. Without it the Supervisor builds the Dockerfile on the host.
+url: https://github.com/Undermozes/robsonfelix-hass-addons
 arch:
   - amd64
   - aarch64
@@ -46,6 +48,8 @@ options:
   enable_playwright_mcp: false
   playwright_cdp_host: ""
   terminal_font_size: 14
+  terminal_font_size_mobile: 13
+  terminal_line_height: 1.2
   terminal_theme: dark
   working_directory: /homeassistant
   session_persistence: true
@@ -65,6 +69,8 @@ schema:
   enable_playwright_mcp: bool
   playwright_cdp_host: str?
   terminal_font_size: int(10,24)
+  terminal_font_size_mobile: int(8,24)
+  terminal_line_height: float(1.0,2.0)
   terminal_theme: list(dark|light)
   working_directory: str
   session_persistence: bool

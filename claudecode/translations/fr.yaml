@@ -26,6 +26,14 @@ configuration:
     description: >-
       Taille de la police pour le terminal web en pixels (10-24).
       Ajustez pour une meilleure lisibilité sur votre affichage.
+  terminal_font_size_mobile:
+    name: Taille de la Police sur Mobile
+    description: >-
+      Taille de la police en pixels (8-24) sur téléphones et tablettes. Les touches A- et A+ de la barre à l'écran la modifient par appareil.
+  terminal_line_height:
+    name: Hauteur de Ligne
+    description: >-
+      Espacement entre les lignes du terminal (1.0-2.0). 1.0 serre les lignes ; 1.2 est plus lisible.
   terminal_theme:
     name: Thème du Terminal
     description: >-

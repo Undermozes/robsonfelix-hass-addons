@@ -23,6 +23,14 @@ configuration:
     description: >-
       Tamaño de fuente del terminal web en píxeles (10-24).
       Ajusta para mejor legibilidad en tu pantalla.
+  terminal_font_size_mobile:
+    name: Tamaño de Fuente en Móvil
+    description: >-
+      Tamaño de fuente en píxeles (8-24) en teléfonos y tabletas. Las teclas A- y A+ de la barra en pantalla lo cambian por dispositivo.
+  terminal_line_height:
+    name: Altura de Línea
+    description: >-
+      Espaciado entre líneas del terminal (1.0-2.0). 1.0 junta mucho las líneas; 1.2 se lee mejor.
   terminal_theme:
     name: Tema del Terminal
     description: >-

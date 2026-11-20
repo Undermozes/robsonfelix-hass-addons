@@ -36,6 +36,14 @@ configuration:
     description: >-
       Font size for the web terminal in pixels (10-24).
       Adjust for readability on your display.
+  terminal_font_size_mobile:
+    name: Mobile Font Size
+    description: >-
+      Font size in pixels (8-24) on phones and tablets. The A- and A+ keys in the on-screen key bar change it per device.
+  terminal_line_height:
+    name: Line Height
+    description: >-
+      Spacing between terminal lines (1.0-2.0). 1.0 packs lines tightly; 1.2 is easier to read.
   terminal_theme:
     name: Terminal Theme
     description: >-

@@ -177,6 +177,8 @@ Then: `action: script.claude_agent` with `prompt:` / `run_id:` data.
 > a modest gap, but if browser automation starts failing with protocol errors,
 > compare the two versions before looking anywhere else.
 | `terminal_font_size` | Font size (10-24) | 14 |
+| `terminal_font_size_mobile` | Font size on phones and tablets (8-24); the A-/A+ keys in the key bar override it per device | 13 |
+| `terminal_line_height` | Spacing between lines (1.0-2.0) | 1.2 |
 | `terminal_theme` | dark or light | dark |
 | `working_directory` | Start directory | /homeassistant |
 | `session_persistence` | Use tmux for persistent sessions | true |
@@ -187,6 +189,18 @@ Then: `action: script.claude_agent` with `prompt:` / `run_id:` data.
 | `extra_npm_packages` | List of npm package specs to install at every container start under `/homeassistant/.claudecode/npm-global` (persistent across add-on rebuilds). Bin dir is on `PATH`. Use to add custom MCP servers without forking the Dockerfile. | `[]` |
 | `remote_control_server` | Run a Remote Control server at boot so you can start new sessions from claude.ai/code or the Claude mobile app. Requires `enable_remote_control` | false |
 | `remote_control_permission_mode` | Permission mode for sessions started through the server: `default`, `acceptEdits`, `auto`, `plan` or `dontAsk` | default |
+
+### Phones and tablets
+
+On a touch screen the terminal shows a key bar at the bottom with the keys a
+soft keyboard lacks: Esc (interrupt Claude), Shift+Tab (switch mode), arrows,
+Enter, Ctrl+C, Tab, paste and A-/A+ for the font size (remembered per device).
+Swipe the bar sideways when it does not fit.
+
+**Foto** uploads photos: they are scaled down, saved in `/media/claudecode/`
+through Home Assistant's media upload, and their paths are typed into the
+prompt so Claude Code can read them. This needs an admin user; the files also
+show up under *Media* in Home Assistant, where you can delete them.
 
 ### Remote Control
 
